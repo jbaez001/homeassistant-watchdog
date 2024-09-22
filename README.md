@@ -1,5 +1,6 @@
 # Home Assistant Watchdog
 
+![GitHub Tag](https://img.shields.io/github/v/tag/jbaez001/homeassistant-watchdog)
 [![Docker Image Version (latest semver)](https://img.shields.io/docker/v/fafson/homeassistant-watchdog?sort=semver)](https://hub.docker.com/r/fafson/homeassistant-watchdog)
 [![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/fafson/homeassistant-watchdog?sort=semver)](https://hub.docker.com/r/fafson/homeassistant-watchdog)
 [![Docker Pulls](https://img.shields.io/docker/pulls/fafson/homeassistant-watchdog)](https://hub.docker.com/r/fafson/homeassistant-watchdog)
