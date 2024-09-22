@@ -29,6 +29,17 @@ Alternatively these variables can be defined in the `.env` file and then mounted
 If no `TELEGRAM_BOT_TOKEN` or `TELEGRAM_CHAT_ID` are provided, the script will not send any messages and merely log the
 output.
 
+### Console
+
+```bash
+# Install requirements
+pip install -r requirements.txt
+
+# Run script (assumes that either the .env file exists
+# or that the environmental variables have been set)
+python homeassistant_watchdog.py
+```
+
 ### Docker
 
 ```bash
