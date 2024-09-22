@@ -1,0 +1,11 @@
+apiVersion: v2
+name: homeassistant-watchdog
+description: homeassistant-watchdog
+type: application
+version: 0.0.1
+appVersion: '0.0.1'
+keywords:
+  - homeassistant
+sources:
+  - https://github.com/jbaez001/homeassistant-watchdog
+

@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-homeassistant-watchdog
+  namespace: {{ .Release.Namespace }}
+spec:
+  schedule: {{ .Values.cronjob.schedule | default "15 0 * * *" | quote }}
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit | default 3 }}
+  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit | default 3 }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: {{ .Values.cronjob.restartPolicy | default "OnFailure" | quote }}
+          containers:
+            - name: homeassistant-watchdog
+              image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              env:
+              {{- if .Values.env.verifySSL }}
+                - name: VERIFY_SSL
+                  value: {{ .Values.env.verifySSL | default "false" | quote }}
+              {{- end }}
+              {{- if .Values.env.keepaliveUpdateThreshold }}
+                - name: KEEPALIVE_THRESHOLD
+                  value: {{ .Values.env.keepaliveUpdateThreshold | default "days=7,hours=0,minutes=0" | quote }}
+              {{- end }}
+              {{- if .Values.env.maxConcurrentRequests }}
+                - name: MAX_CONCURRENT_REQUESTS
+                  value: {{ .Values.env.maxConcurrentRequests | default "4" | quote }}
+              {{- end }}
+                - name: HOMEASSISTANT_API_URL
+                  value: {{ .Values.env.homeassistantApiUrl | default "https://localhost/api" | quote }}
+                - name: HOMEASSISTANT_API_TOKEN
+                  value: {{ .Values.env.homeassistantApiToken | quote }}
+                - name: HOMEASSISTANT_ENTITY_ID
+                  value: {{ .Values.env.homeassistantEntityID | quote }}
+                {{- if .Values.env.telegramBotToken }}
+                - name: TELEGRAM_BOT_TOKEN
+                  value: {{ .Values.env.telegramBotToken | quote }}
+                {{- end }}
+                {{- if .Values.env.telegramChatID }}
+                - name: TELEGRAM_CHAT_ID
+                  value: {{ .Values.env.telegramChatID | quote }}
+                {{- end }}
+                {{- if .Values.env.telegramTimeout }}
+                - name: TELEGRAM_TIMEOUT
+                  value: {{ .Values.env.telegramTimeout | default "60" | quote }}
+                {{- end }}

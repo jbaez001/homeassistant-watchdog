@@ -1,0 +1,7 @@
+services:
+  homeassistant-watchdog:
+    # image: fafson/homeassistant-watchdog:latest
+    build: .
+    restart: no
+    volumes:
+      - .env:/opt/homeassistant-watchdog/.env

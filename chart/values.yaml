@@ -1,0 +1,21 @@
+image:
+  repository: 'fafson/homeassistant-watchdog'
+  tag: 'v0.0.1'
+  pullPolicy: 'IfNotPresent'
+
+cronjob:
+  schedule: '15 */12 * * *'
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  restartPolicy: Never
+
+env:
+  verifySSL: 'true'
+  keepaliveUpdateThreshold: 'days=7,hours=0,minutes=0'
+  maxConcurrentRequests: '4'
+  homeassistantApiUrl: ''
+  homeassistantApiToken: ''
+  homeassistantEntityID: ''
+  telegramBotToken: ''
+  telegramChatID: ''
+  telegramTimeout: '60'
