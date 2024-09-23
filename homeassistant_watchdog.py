@@ -53,21 +53,6 @@ def setup_logger(level: int = logging.WARNING) -> None:
     logging.getLogger().addHandler(console_logger)
 
 
-async def get_homeassistant_async_client() -> Client:
-    """Get a Home Assistant client object
-
-    Returns:
-        Client: Home Assistant client object (async)
-    """
-    return Client(
-        ENV_HOMEASSISTANT_API_URL,
-        ENV_HOMEASSISTANT_API_TOKEN,
-        verify_ssl=ENV_VERIFY_SSL,
-        use_async=True,
-        async_cache_session=None,
-    )
-
-
 def send_telegram_message(message: str,
                           telegram_bot_token: str = ENV_TELEGRAM_BOT_TOKEN,
                           telegram_chat_id: str = ENV_TELEGRAM_CHAT_ID,
@@ -163,13 +148,29 @@ def format_timedelta(td: timedelta) -> str:
     return ' '.join(parts)
 
 
-async def check_if_entity_last_updated(client: Client, entity_id: str, delta: timedelta) -> bool:
+async def get_homeassistant_async_client() -> Client:
+    """Get a Home Assistant client object
+
+    Returns:
+        Client: Home Assistant client object (async)
+    """
+    return Client(
+        ENV_HOMEASSISTANT_API_URL,
+        ENV_HOMEASSISTANT_API_TOKEN,
+        verify_ssl=ENV_VERIFY_SSL,
+        use_async=True,
+        async_cache_session=None,
+    )
+
+
+async def check_if_entity_last_updated_within_threshold(client: Client, entity_id: str,
+                                                        last_update_threshold: timedelta) -> bool:
     """Check if an entity has been updated within a certain threshold
 
     Args:
         client (Client): client object
         entity_id (str): entity id to check
-        delta (timedelta): time delta to check
+        last_update_threshold (timedelta): time delta to check
 
     Raises:
         ValueError: if entity not found
@@ -193,7 +194,7 @@ async def check_if_entity_last_updated(client: Client, entity_id: str, delta: ti
     if last_update is None:
         raise ValueError('Last update not found') if last_update is None else None
 
-    within_threshold = last_update >= (current_time - delta)
+    within_threshold = last_update >= (current_time - last_update_threshold)
 
     logging.info('[%s] Current time: %s, Last update: %s, Within thresholds: %s',
                  entity_id, current_time, last_update, within_threshold)
@@ -244,7 +245,7 @@ async def check_entities():
     async def _check_entity(entity_id: str):
         async with sem:
             try:
-                await check_if_entity_last_updated(
+                await check_if_entity_last_updated_within_threshold(
                     client, entity_id, KEEP_ALIVE_LAST_UPDATE_THRESHOLD)
 
             except ValueError as exc:
@@ -265,15 +266,16 @@ async def main():
     """main entrypoint
     """
 
-    await check_entities()
-
-
-if __name__ == '__main__':
     # setup logger
     setup_logger(logging.INFO)
 
     # check if required environment variables are set
     check_variables()
 
+    # block until all entities have been checked
+    await check_entities()
+
+
+if __name__ == '__main__':
     # run the main function
     asyncio.run(main())
