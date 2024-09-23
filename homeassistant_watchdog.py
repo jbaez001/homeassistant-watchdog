@@ -212,12 +212,19 @@ async def check_if_entity_last_updated_within_threshold(client: Client, entity_i
     return within_threshold
 
 
-async def get_entities_to_check(client: Client, entity_kind: str) -> list[Entity] | None:
-    """Get a list of entities to check"""
+async def get_entities_to_check(client: Client, group: str) -> list[Entity] | None:
+    """Get entities to check
 
+    Args:
+        client (Client): Home Assistant client object
+        group (str): group to check
+
+    Returns:
+        list[Entity] | None: list of entities to check
+    """
     results = await client.async_get_entities()
 
-    if entity_kind in results:
+    if group in results:
         return list(results['person'].entities.values())
 
     return None
